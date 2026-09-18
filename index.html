@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOnder 😂</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+
+    <section class="quiz" id="quiz">
+      <div class="brand">✨ TOnder</div>
+      <p class="tiny">THE 100% SCIENTIFIC DATING QUIZ</p>
+
+      <div class="progress-wrap">
+        <div class="progress" id="progress"></div>
+      </div>
+
+      <p class="question-number" id="questionNumber">QUESTION 1 OF 7</p>
+      <h1 id="question">Loading...</h1>
+      <p class="subtitle" id="subtitle"></p>
+
+      <div class="answers" id="answers"></div>
+
+      <button class="next" id="nextBtn" disabled>Next →</button>
+    </section>
+
+    <section class="result hidden" id="result">
+      <div class="confetti" id="confetti"></div>
+
+      <div class="brand">✨ TOnder</div>
+      <div class="result-icon">🎉</div>
+      <p class="eyebrow">THE ALGORITHM HAS SPOKEN</p>
+      <h1>YOU FOUND YOUR DATE!</h1>
+
+      <div class="match-photo">
+        <!-- Put your image in this folder and name it exactly: endpicture.png -->
+        <img src="endpicture.png" alt="Your totally scientific date result"
+             onerror="this.style.display='none'; document.getElementById('fallback').style.display='grid';">
+        <div class="fallback" id="fallback">
+          <span>📸</span>
+          <small>Add <b>endpicture.png</b> to this folder</small>
+        </div>
+      </div>
+
+      <p class="result-text">
+        After analyzing your extremely important answers, our super-computer
+        has determined that THIS is your completely predetermined date.
+        🤝😂
+      </p>
+
+      <div class="traits">
+        <span>certified date</span>
+        <span>100% legit</span>
+        <span>probably</span>
+      </div>
+
+      <!-- Optional audio. Put endaudio.mp3 beside index.html. -->
+      <audio id="endAudio" src="endaudio.mp3" preload="auto"></audio>
+
+      <button class="restart" id="restartBtn">Do it again 🔄</button>
+    </section>
+
+  </main>
+
+  <script>
+    const questions = [
+      {
+        question: "What's your ideal Friday night?",
+        subtitle: "Choose your most likely activity.",
+        answers: [
+          "Playing games 🎮",
+          "Hanging out with friends 🧑‍🤝‍🧑",
+          "Watching YouTube 📺",
+          "Going outside 🌳"
+        ]
+      },
+      {
+        question: "Pick a snack.",
+        subtitle: "This is obviously very important.",
+        answers: [
+          "Chips 🥔",
+          "Chocolate 🍫",
+          "Pizza 🍕",
+          "Whatever I can find 😭"
+        ]
+      },
+      {
+        question: "Someone sends you a terrible meme. You...",
+        subtitle: "Be honest.",
+        answers: [
+          "Laugh anyway 😂",
+          "Send an even worse one",
+          "Leave them on read 👀",
+          "Steal it and send it to someone else"
+        ]
+      },
+      {
+        question: "Pick a game.",
+        subtitle: "There is no wrong answer. Probably.",
+        answers: [
+          "Minecraft ⛏️",
+          "Roblox 🎮",
+          "Fortnite 🚌",
+          "Something completely random"
+        ]
+      },
+      {
+        question: "Someone says I have an idea.'",
+        subtitle: "What's your response?",
+        answers: [
+          "YES. Immediately.",
+          "What kind of idea? 🤨",
+          "This sounds dangerous...",
+          "I'm already involved."
+        ]
+      },
+      {
+        question: "Pick a superpower.",
+        subtitle: "Time to become ridiculously overpowered.",
+        answers: [
+          "Teleportation ⚡",
+          "Flying 🦸",
+          "Reading minds 🧠",
+          "Unlimited snacks 🍪"
+        ]
+      },
+      {
+        question: "Final question: what makes someone a great person?",
+        subtitle: "The final, extremely scientific decision.",
+        answers: [
+          "Being funny 😂",
+          "Always being there 🤝",
+          "Being chaotic together 🌀",
+          "Sharing snacks 🍕"
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let selectedAnswer = null;
+
+    const questionEl = document.getElementById("question");
+    const subtitleEl = document.getElementById("subtitle");
+    const answersEl = document.getElementById("answers");
+    const progressEl = document.getElementById("progress");
+    const questionNumberEl = document.getElementById("questionNumber");
+    const nextBtn = document.getElementById("nextBtn");
+    const quizEl = document.getElementById("quiz");
+    const resultEl = document.getElementById("result");
+    const endAudio = document.getElementById("endAudio");
+
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+
+      questionNumberEl.textContent =
+        `QUESTION ${currentQuestion + 1} OF ${questions.length}`;
+
+      questionEl.textContent = q.question;
+      subtitleEl.textContent = q.subtitle;
+      progressEl.style.width =
+        `${((currentQuestion + 1) / questions.length) * 100}%`;
+
+      answersEl.innerHTML = "";
+      selectedAnswer = null;
+      nextBtn.disabled = true;
+
+      q.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.className = "answer";
+        button.textContent = answer;
+
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".answer").forEach(b =>
+            b.classList.remove("selected")
+          );
+
+          button.classList.add("selected");
+          selectedAnswer = index;
+          nextBtn.disabled = false;
+        });
+
+        answersEl.appendChild(button);
+      });
+
+      nextBtn.textContent =
+        currentQuestion === questions.length - 1
+          ? "Reveal my date 🎉"
+          : "Next →";
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (selectedAnswer === null) return;
+
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      quizEl.classList.add("hidden");
+      resultEl.classList.remove("hidden");
+
+      // RIGGED: every possible answer combination gets this same result.
+      createConfetti();
+
+      // The last button click is a user interaction, so autoplay is
+      // allowed by many browsers. If a browser blocks it, no problem:
+      // the rest of the result still works.
+      endAudio.currentTime = 0;
+      endAudio.play().catch(() => {
+        // Browser autoplay policy blocked it.
+        // The audio file is still loaded and can be played if controls
+        // are enabled or another user interaction is added.
+      });
+    }
+
+    function createConfetti() {
+      const container = document.getElementById("confetti");
+      const pieces = ["🎉", "✨", "🎊", "⭐", "💫", "🥳", "🎈", "😂"];
+
+      container.innerHTML = "";
+
+      for (let i = 0; i < 45; i++) {
+        const piece = document.createElement("span");
+        piece.textContent = pieces[Math.floor(Math.random() * pieces.length)];
+        piece.style.left = Math.random() * 100 + "%";
+        piece.style.animationDelay = Math.random() * 1.2 + "s";
+        piece.style.animationDuration = (2.2 + Math.random() * 2) + "s";
+        container.appendChild(piece);
+      }
+    }
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      currentQuestion = 0;
+      selectedAnswer = null;
+
+      endAudio.pause();
+      endAudio.currentTime = 0;
+
+      resultEl.classList.add("hidden");
+      quizEl.classList.remove("hidden");
+
+      renderQuestion();
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>
